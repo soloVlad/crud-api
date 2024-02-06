@@ -1,12 +1,10 @@
 module.exports = {
   'env': {
     'browser': true,
+    'commonjs': true,
     'es2021': true
   },
-  'extends': [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended'
-  ],
+  "extends": "standard-with-typescript",
   'overrides': [
     {
       'env': {
@@ -23,48 +21,48 @@ module.exports = {
   'parser': '@typescript-eslint/parser',
   'parserOptions': {
     'ecmaVersion': 'latest',
-    'sourceType': 'module'
   },
   'plugins': [
     '@typescript-eslint'
   ],
   'rules': {
-    "no-unused-vars": "warn",
-    'indent': [
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-var-requires': false,
+    '@typescript-eslint/indent': [
       'error',
       2
     ],
-    'linebreak-style': [
+    '@typescript-eslint/linebreak-style': [
       'error',
       'unix'
     ],
-    'quotes': [
+    '@typescript-eslint/quotes': [
       'error',
       'single'
     ],
-    'semi': [
+    '@typescript-eslint/semi': [
       'error',
       'always'
     ],
-    'eol-last': [
+    '@typescript-eslint/eol-last': [
       'error',
       'always'
     ],
-    'comma-dangle': ['error', {
+    '@typescript-eslint/comma-dangle': ['error', {
       'arrays': 'always-multiline',
       'objects': 'always-multiline',
       'imports': 'always-multiline',
       'exports': 'always-multiline',
       'functions': 'never',
     }],
-    'max-len': ['warn', {
+    '@typescript-eslint/max-len': ['warn', {
       'code': 100,
       'ignoreStrings': true,
       'ignoreUrls': true,
     }],
   },
   "ignorePatterns": [
-    ".eslintrc.cjs",
+    ".eslintrc.js",
     "node_modules",
     "dist"
   ],
