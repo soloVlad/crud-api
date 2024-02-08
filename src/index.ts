@@ -1,22 +1,40 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
 
 import { bodyParser, isUser } from './utils';
-import { User, DBUser } from './types';
+import { DBUser } from './types';
 
-const users: DBUser[] = [];
+const users: DBUser[] = [
+  {
+    id: 1,
+    username: 'vlad',
+    age: 20,
+    hobbies: ['arra'],
+  }
+];
 
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
-  try {
-    const body = await bodyParser(req);
-    console.log(body);
-  } catch (error) {
-    console.error(error);
+  const { url, method } = req;
+
+  if (url === '/users') {
+    switch (method) {
+      case 'GET':
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(users));
+        break;
+    }
   }
 
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({
-    data: 'Hello World!',
-  }));
+  // try {
+  //   const body = await bodyParser(req);
+  //   console.log(body);
+  // } catch (error) {
+  //   console.error(error);
+  // }
+
+  // res.writeHead(200, { 'Content-Type': 'application/json' });
+  // res.end(JSON.stringify({
+  //   data: 'Hello World!',
+  // }));
 });
 
 server.listen(4001);
