@@ -1,8 +1,11 @@
-import http = require('http');
+import http, { IncomingMessage, ServerResponse } from 'http';
 
-const { bodyParser } = require('./utils/bodyParser');
+import { bodyParser, isUser } from './utils';
+import { User, DBUser } from './types';
 
-const server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
+const users: DBUser[] = [];
+
+const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
   try {
     const body = await bodyParser(req);
     console.log(body);

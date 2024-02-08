@@ -1,6 +1,6 @@
-import http = require('http');
+import { IncomingMessage } from 'http';
 
-const bodyParser = (req: http.IncomingMessage) => {
+const bodyParser = (req: IncomingMessage) => {
   return new Promise((resolve, reject) => {
     const body: any[] = [];
 
@@ -12,7 +12,7 @@ const bodyParser = (req: http.IncomingMessage) => {
       if (contentType?.includes('application/json')) {
         try {
           const parsedBody = JSON.parse(rawData);
-          reject(parsedBody);
+          resolve(parsedBody);
         } catch (error) {
           reject(error);
         }
@@ -26,6 +26,4 @@ const bodyParser = (req: http.IncomingMessage) => {
   })
 }
 
-module.exports = {
-  bodyParser,
-};
+export default bodyParser;
