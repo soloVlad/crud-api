@@ -1,7 +1,15 @@
-const http = require('http');
+import http = require('http');
 
-//@ts-ignore
-const server = http.createServer((req, res) => {
+const { bodyParser } = require('./utils/bodyParser');
+
+const server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  try {
+    const body = await bodyParser(req);
+    console.log(body);
+  } catch (error) {
+    console.error(error);
+  }
+
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({
     data: 'Hello World!',
