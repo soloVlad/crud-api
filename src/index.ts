@@ -1,8 +1,11 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
+import 'dotenv/config';
 
 import db from './db';
 import handlers from './handlers';
 import { getErrorMessage, uuid } from './utils';
+
+const PORT = process.env.PORT || 4001;
 
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
   try {
@@ -64,4 +67,6 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
   }
 });
 
-server.listen(4001);
+server.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
