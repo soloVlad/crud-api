@@ -15,7 +15,7 @@ const users: DBUser[] = [
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
   const { url, method } = req;
 
-  if (url === '/users') {
+  if (url === '/api/users') {
     switch (method) {
       case 'GET':
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -44,7 +44,7 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
           res.end(errorMessage);
         }
         break;
-    }q
+    }
   }
 });
 
