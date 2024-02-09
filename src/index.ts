@@ -67,6 +67,11 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(user));
         break;
+      case 'DELETE':
+        db.remove(id);
+        res.writeHead(204);
+        res.end();
+        break;
     }
   }
 });
