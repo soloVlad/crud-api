@@ -95,6 +95,9 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
         break;
     }
   }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain' });
+  res.end('Unknown route');
 });
 
 server.listen(4001);
