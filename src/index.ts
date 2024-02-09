@@ -1,16 +1,7 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
 
-import { bodyParser, isUser, generateId, getErrorMessage } from './utils';
-import { DBUser } from './types';
-
-const users: DBUser[] = [
-  {
-    id: '1',
-    username: 'vlad',
-    age: 20,
-    hobbies: ['arra'],
-  }
-];
+import db from './db';
+import { bodyParser, isUser, getErrorMessage } from './utils';
 
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
   const { url, method } = req;
@@ -18,6 +9,7 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
   if (url === '/api/users') {
     switch (method) {
       case 'GET':
+        const users = db.getAll();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(users));
         break;
@@ -27,10 +19,7 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
           const body = await bodyParser(req);
 
           if (isUser(body)) {
-            const id = generateId();
-            const newUser = { id, ...body } as DBUser;
-
-            users.push(newUser);
+            const newUser = db.add(body);
 
             res.writeHead(201, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(newUser));
@@ -45,6 +34,10 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
         }
         break;
     }
+  }
+
+  if (url && /^\/api\/users\/\w+$/.test(url)) {
+
   }
 });
 
