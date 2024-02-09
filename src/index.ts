@@ -1,7 +1,12 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
 
 import db from './db';
-import { bodyParser, isUser, getErrorMessage } from './utils';
+import {
+  bodyParser,
+  isUser,
+  getErrorMessage,
+  uuid
+} from './utils';
 
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
   const { url, method } = req;
@@ -36,8 +41,33 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
     }
   }
 
-  if (url && /^\/api\/users\/\w+$/.test(url)) {
+  const idRegex = /^\/api\/users\/[\w-]+$/;
 
+  if (url && idRegex.test(url)) {
+    const id = url.split('/').at(-1);
+    const isValidId = uuid.isUUID(id!);
+
+    if (!isValidId || !id) {
+      res.writeHead(400, { 'Content-Type': 'text/plain' })
+      res.end('userId is invalid(not uuid)');
+      return;
+    }
+
+    const isExist = db.has(id);
+
+    if (!isExist) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' })
+      res.end('User not found');
+      return;
+    }
+
+    switch (method) {
+      case 'GET':
+        const user = db.get(id);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(user));
+        break;
+    }
   }
 });
 
