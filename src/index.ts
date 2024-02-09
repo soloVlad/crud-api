@@ -1,6 +1,7 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
 
 import db from './db';
+import handlers from './handlers';
 import {
   bodyParser,
   isUser,
@@ -16,29 +17,11 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
     if (url === '/api/users') {
       switch (method) {
         case 'GET':
-          const users = db.getAll();
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify(users));
+          await handlers.getAll(req, res);
           break;
 
         case 'POST':
-          try {
-            const body = await bodyParser(req);
-
-            if (isUser(body)) {
-              const newUser = db.add(body);
-
-              res.writeHead(201, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify(newUser));
-            } else {
-              throw new Error('Invalid user info. \nEnsure you specified all required fields');
-            }
-          } catch (error) {
-            const errorMessage = getErrorMessage(error);
-
-            res.writeHead(400, { 'Content-Type': 'text/plain' })
-            res.end(errorMessage);
-          }
+          await handlers.createUser(req, res);
           break;
       }
     }
@@ -62,35 +45,15 @@ const server = http.createServer(async (req: IncomingMessage, res: ServerRespons
 
       switch (method) {
         case 'GET':
-          const user = db.get(id);
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify(user));
+          await handlers.getById(req, res, id);
           break;
 
         case 'DELETE':
-          db.remove(id);
-          res.writeHead(204);
-          res.end();
+          await handlers.remove(req, res, id);
           break;
 
         case 'PUT':
-          try {
-            const body = await bodyParser(req);
-
-            if (isUser(body)) {
-              const newUser = db.update(id, body);
-
-              res.writeHead(200, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify(newUser));
-            } else {
-              throw new Error('Invalid user info. \nEnsure you specified all required fields');
-            }
-          } catch (error) {
-            const errorMessage = getErrorMessage(error);
-
-            res.writeHead(400, { 'Content-Type': 'text/plain' })
-            res.end(errorMessage);
-          }
+          await handlers.update(req, res, id);
           break;
       }
     }
