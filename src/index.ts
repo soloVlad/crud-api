@@ -1,6 +1,6 @@
 import http, { IncomingMessage, ServerResponse } from 'http';
 
-import { bodyParser, isUser } from './utils';
+import { bodyParser, isUser, generateId } from './utils';
 import { DBUser } from './types';
 
 const users: DBUser[] = [
