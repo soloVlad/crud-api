@@ -5,5 +5,5 @@ export type User = {
 };
 
 export type DBUser = User & {
-  id: number;
+  id: string;
 }
