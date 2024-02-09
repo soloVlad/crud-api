@@ -26,6 +26,17 @@ const remove = (id: DBUser['id']) => {
   users = users.filter(user => user.id !== id);
 }
 
+const update = (id: DBUser['id'], userInfo: User) => {
+  if (!has(id)) return;
+
+  const index = users.findIndex(user => user.id === id);
+  const newUser = { ...users[index], ...userInfo };
+
+  users[index] = newUser;
+
+  return newUser;
+}
+
 const has = (id: DBUser['id']) => {
   return users.some(user => user.id === id);
 }
@@ -36,5 +47,6 @@ export default {
   get,
   add,
   remove,
+  update,
   has,
 }
