@@ -2,12 +2,7 @@ import http, { IncomingMessage, ServerResponse } from 'http';
 
 import db from './db';
 import handlers from './handlers';
-import {
-  bodyParser,
-  isUser,
-  getErrorMessage,
-  uuid
-} from './utils';
+import { getErrorMessage, uuid } from './utils';
 
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
   try {
