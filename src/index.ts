@@ -9,95 +9,101 @@ import {
 } from './utils';
 
 const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
-  const { url, method } = req;
+  try {
+    const { url, method } = req;
+    const idRegex = /^\/api\/users\/[\w-]+$/;
 
-  if (url === '/api/users') {
-    switch (method) {
-      case 'GET':
-        const users = db.getAll();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(users));
-        break;
+    if (url === '/api/users') {
+      switch (method) {
+        case 'GET':
+          const users = db.getAll();
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(users));
+          break;
 
-      case 'POST':
-        try {
-          const body = await bodyParser(req);
+        case 'POST':
+          try {
+            const body = await bodyParser(req);
 
-          if (isUser(body)) {
-            const newUser = db.add(body);
+            if (isUser(body)) {
+              const newUser = db.add(body);
 
-            res.writeHead(201, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(newUser));
-          } else {
-            throw new Error('Invalid user info. \nEnsure you specified all required fields');
+              res.writeHead(201, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(newUser));
+            } else {
+              throw new Error('Invalid user info. \nEnsure you specified all required fields');
+            }
+          } catch (error) {
+            const errorMessage = getErrorMessage(error);
+
+            res.writeHead(400, { 'Content-Type': 'text/plain' })
+            res.end(errorMessage);
           }
-        } catch (error) {
-          const errorMessage = getErrorMessage(error);
-
-          res.writeHead(400, { 'Content-Type': 'text/plain' })
-          res.end(errorMessage);
-        }
-        break;
+          break;
+      }
     }
-  }
+    else if (url && idRegex.test(url)) {
+      const id = url.split('/').at(-1);
+      const isValidId = uuid.isUUID(id!);
 
-  const idRegex = /^\/api\/users\/[\w-]+$/;
+      if (!isValidId || !id) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' })
+        res.end('userId is invalid(not uuid)');
+        return;
+      }
 
-  if (url && idRegex.test(url)) {
-    const id = url.split('/').at(-1);
-    const isValidId = uuid.isUUID(id!);
+      const isExist = db.has(id);
 
-    if (!isValidId || !id) {
-      res.writeHead(400, { 'Content-Type': 'text/plain' })
-      res.end('userId is invalid(not uuid)');
-      return;
-    }
+      if (!isExist) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' })
+        res.end('User not found');
+        return;
+      }
 
-    const isExist = db.has(id);
+      switch (method) {
+        case 'GET':
+          const user = db.get(id);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(user));
+          break;
 
-    if (!isExist) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' })
-      res.end('User not found');
-      return;
-    }
+        case 'DELETE':
+          db.remove(id);
+          res.writeHead(204);
+          res.end();
+          break;
 
-    switch (method) {
-      case 'GET':
-        const user = db.get(id);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(user));
-        break;
+        case 'PUT':
+          try {
+            const body = await bodyParser(req);
 
-      case 'DELETE':
-        db.remove(id);
-        res.writeHead(204);
-        res.end();
-        break;
+            if (isUser(body)) {
+              const newUser = db.update(id, body);
 
-      case 'PUT':
-        try {
-          const body = await bodyParser(req);
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(newUser));
+            } else {
+              throw new Error('Invalid user info. \nEnsure you specified all required fields');
+            }
+          } catch (error) {
+            const errorMessage = getErrorMessage(error);
 
-          if (isUser(body)) {
-            const newUser = db.update(id, body);
-
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(newUser));
-          } else {
-            throw new Error('Invalid user info. \nEnsure you specified all required fields');
+            res.writeHead(400, { 'Content-Type': 'text/plain' })
+            res.end(errorMessage);
           }
-        } catch (error) {
-          const errorMessage = getErrorMessage(error);
-
-          res.writeHead(400, { 'Content-Type': 'text/plain' })
-          res.end(errorMessage);
-        }
-        break;
+          break;
+      }
     }
-  }
+    else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Unknown route');
+    }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
 
-  res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('Unknown route');
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end(errorMessage);
+  }
 });
 
 server.listen(4001);
